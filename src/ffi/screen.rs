@@ -17,11 +17,11 @@ pub enum VTermAttrMask {}
 #[derive(Debug)]
 #[repr(C)]
 pub struct VTermScreenCallbacks {
-    pub damage: Option<extern "C" fn(VTermRect, *mut c_void) -> (c_int)>,
-    pub move_rect: Option<extern "C" fn(VTermRect, VTermRect, *mut c_void) -> (c_int)>,
-    pub move_cursor: Option<extern "C" fn(VTermPos, VTermPos, c_int, *mut c_void) -> (c_int)>,
-    pub set_term_prop: Option<extern "C" fn(VTermProp, *mut VTermValue, *mut c_void) -> (c_int)>,
-    pub bell: Option<extern "C" fn(*mut c_void) -> (c_int)>,
+    pub damage: Option<extern "C" fn(VTermRect, *mut c_void) -> c_int>,
+    pub move_rect: Option<extern "C" fn(VTermRect, VTermRect, *mut c_void) -> c_int>,
+    pub move_cursor: Option<extern "C" fn(VTermPos, VTermPos, c_int, *mut c_void) -> c_int>,
+    pub set_term_prop: Option<extern "C" fn(VTermProp, *mut VTermValue, *mut c_void) -> c_int>,
+    pub bell: Option<extern "C" fn(*mut c_void) -> c_int>,
     pub resize: Option<extern "C" fn(c_int, c_int, *mut c_void) -> c_int>,
     pub sb_pushline: Option<extern "C" fn(c_int, *const VTermScreenCell, *mut c_void) -> c_int>,
     pub sb_popline: Option<extern "C" fn(c_int, *const VTermScreenCell, *mut c_void) -> c_int>,
@@ -134,7 +134,7 @@ mod tests {
 
     fn handler_helper(name: String, strings: *mut c_void) {
         println!("handler helper {}", name);
-        let mut strings: &mut Vec<String> = unsafe { &mut *(strings as *mut Vec<String>) };
+        let strings: &mut Vec<String> = unsafe { &mut *(strings as *mut Vec<String>) };
         strings.push(name);
     }
 

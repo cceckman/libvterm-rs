@@ -123,6 +123,7 @@ pub enum VTermAttr {
 }
 
 #[repr(C)]
+#[allow(non_camel_case_types)]
 pub enum VTermModifier {
     VTERM_MOD_NONE = 0x00,
     VTERM_MOD_SHIFT = 0x01,
@@ -131,6 +132,7 @@ pub enum VTermModifier {
 }
 
 #[repr(C)]
+#[allow(non_camel_case_types)]
 pub enum VTermKey {
     VTERM_KEY_NONE,
 

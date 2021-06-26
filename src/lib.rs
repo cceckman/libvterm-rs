@@ -1,7 +1,6 @@
-#[macro_use]
-extern crate log;
 extern crate euclid;
 extern crate libc;
+extern crate log;
 
 use libc::c_int;
 
