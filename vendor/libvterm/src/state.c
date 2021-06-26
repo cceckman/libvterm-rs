@@ -57,6 +57,12 @@ static VTermState *vterm_state_new(VTerm *vt)
   state->rows = vt->rows;
   state->cols = vt->cols;
 
+  state->mouse_col     = 0;
+  state->mouse_row     = 0;
+  state->mouse_buttons = 0;
+
+  state->mouse_protocol = MOUSE_X10;
+
   state->callbacks = NULL;
   state->cbdata    = NULL;
 
@@ -254,7 +260,7 @@ static int on_text(const char bytes[], size_t len, void *user)
    * for even a single codepoint
    */
   if(!npoints)
-    return 0;
+    return eaten;
 
   if(state->gsingle_set && npoints)
     state->gsingle_set = 0;
@@ -750,21 +756,15 @@ static void set_dec_mode(VTermState *state, int num, int val)
   case 1000:
   case 1002:
   case 1003:
-    if(val) {
-      state->mouse_col     = 0;
-      state->mouse_row     = 0;
-      state->mouse_buttons = 0;
+    settermprop_int(state, VTERM_PROP_MOUSE,
+        !val          ? VTERM_PROP_MOUSE_NONE  :
+        (num == 1000) ? VTERM_PROP_MOUSE_CLICK :
+        (num == 1002) ? VTERM_PROP_MOUSE_DRAG  :
+                        VTERM_PROP_MOUSE_MOVE);
+    break;
 
-      state->mouse_protocol = MOUSE_X10;
-
-      settermprop_int(state, VTERM_PROP_MOUSE,
-          (num == 1000) ? VTERM_PROP_MOUSE_CLICK :
-          (num == 1002) ? VTERM_PROP_MOUSE_DRAG  :
-                          VTERM_PROP_MOUSE_MOVE);
-    }
-    else
-      settermprop_int(state, VTERM_PROP_MOUSE, VTERM_PROP_MOUSE_NONE);
-
+  case 1004:
+    state->mode.report_focus = val;
     break;
 
   case 1005:
@@ -847,6 +847,10 @@ static void request_dec_mode(VTermState *state, int num)
       reply = state->mouse_flags == (MOUSE_WANT_CLICK|MOUSE_WANT_MOVE);
       break;
 
+    case 1004:
+      reply = state->mode.report_focus;
+      break;
+
     case 1005:
       reply = state->mouse_protocol == MOUSE_UTF8;
       break;
@@ -865,6 +869,7 @@ static void request_dec_mode(VTermState *state, int num)
 
     case 2004:
       reply = state->mode.bracketpaste;
+      break;
 
     default:
       vterm_push_output_sprintf_ctrl(state->vt, C1_CSI, "?%d;%d$y", num, 0);
@@ -879,6 +884,7 @@ static int on_csi(const char *leader, const long args[], int argcount, const cha
   VTermState *state = user;
   int leader_byte = 0;
   int intermed_byte = 0;
+  int cancel_phantom = 1;
 
   if(leader && leader[0]) {
     if(leader[1]) // longer than 1 char
@@ -1172,6 +1178,24 @@ static int on_csi(const char *leader, const long args[], int argcount, const cha
     state->at_phantom = 0;
     break;
 
+  case 0x62: { // REP - ECMA-48 8.3.103
+    const int row_width = THISROWWIDTH(state);
+    count = CSI_ARG_COUNT(args[0]);
+    col = state->pos.col + count;
+    UBOUND(col, row_width);
+    while (state->pos.col < col) {
+      putglyph(state, state->combine_chars, state->combine_width, state->pos);
+      state->pos.col += state->combine_width;
+    }
+    if (state->pos.col + state->combine_width >= row_width) {
+      if (state->mode.autowrap) {
+        state->at_phantom = 1;
+        cancel_phantom = 0;
+      }
+    }
+    break;
+  }
+
   case 0x63: // DA - ECMA-48 8.3.24
     val = CSI_ARG_OR(args[0], 0);
     if(val == 0)
@@ -1361,6 +1385,14 @@ static int on_csi(const char *leader, const long args[], int argcount, const cha
       state->scrollregion_bottom = -1;
     }
 
+    // Setting the scrolling region restores the cursor to the home position
+    state->pos.row = 0;
+    state->pos.col = 0;
+    if(state->mode.origin) {
+      state->pos.row += state->scrollregion_top;
+      state->pos.col += SCROLLREGION_LEFT(state);
+    }
+
     break;
 
   case 0x73: // DECSLRM - DEC custom
@@ -1380,6 +1412,14 @@ static int on_csi(const char *leader, const long args[], int argcount, const cha
       // Invalid
       state->scrollregion_left  = 0;
       state->scrollregion_right = -1;
+    }
+
+    // Setting the scrolling region restores the cursor to the home position
+    state->pos.row = 0;
+    state->pos.col = 0;
+    if(state->mode.origin) {
+      state->pos.row += state->scrollregion_top;
+      state->pos.col += SCROLLREGION_LEFT(state);
     }
 
     break;
@@ -1435,7 +1475,7 @@ static int on_csi(const char *leader, const long args[], int argcount, const cha
     UBOUND(state->pos.col, THISROWWIDTH(state)-1);
   }
 
-  updatecursor(state, &oldpos, 1);
+  updatecursor(state, &oldpos, cancel_phantom);
 
 #ifdef DEBUG
   if(state->pos.row < 0 || state->pos.row >= state->rows ||
@@ -1490,28 +1530,44 @@ static int on_osc(const char *command, size_t cmdlen, void *user)
 
 static void request_status_string(VTermState *state, const char *command, size_t cmdlen)
 {
+  VTerm *vt = state->vt;
+
   if(cmdlen == 1)
     switch(command[0]) {
       case 'm': // Query SGR
         {
           long args[20];
           int argc = vterm_state_getpen(state, args, sizeof(args)/sizeof(args[0]));
-          vterm_push_output_sprintf_ctrl(state->vt, C1_DCS, "1$r");
-          for(int argi = 0; argi < argc; argi++)
-            vterm_push_output_sprintf(state->vt,
-                argi == argc - 1             ? "%d" :
-                CSI_ARG_HAS_MORE(args[argi]) ? "%d:" :
-                                               "%d;",
+          size_t cur = 0;
+
+          cur += snprintf(vt->tmpbuffer + cur, vt->tmpbuffer_len - cur,
+              vt->mode.ctrl8bit ? "\x90" "1$r" : ESC_S "P" "1$r"); // DCS 1$r ...
+          if(cur >= vt->tmpbuffer_len)
+            return;
+
+          for(int argi = 0; argi < argc; argi++) {
+            cur += snprintf(vt->tmpbuffer + cur, vt->tmpbuffer_len - cur,
+                argi == argc - 1             ? "%ld" :
+                CSI_ARG_HAS_MORE(args[argi]) ? "%ld:" :
+                                               "%ld;",
                 CSI_ARG(args[argi]));
-          vterm_push_output_sprintf(state->vt, "m");
-          vterm_push_output_sprintf_ctrl(state->vt, C1_ST, "");
+            if(cur >= vt->tmpbuffer_len)
+              return;
+          }
+
+          cur += snprintf(vt->tmpbuffer + cur, vt->tmpbuffer_len - cur,
+              vt->mode.ctrl8bit ? "m" "\x9C" : "m" ESC_S "\\"); // ... m ST
+          if(cur >= vt->tmpbuffer_len)
+            return;
+
+          vterm_push_output_bytes(vt, vt->tmpbuffer, cur);
         }
         return;
       case 'r': // Query DECSTBM
-        vterm_push_output_sprintf_dcs(state->vt, "1$r%d;%dr", state->scrollregion_top+1, SCROLLREGION_BOTTOM(state));
+        vterm_push_output_sprintf_dcs(vt, "1$r%d;%dr", state->scrollregion_top+1, SCROLLREGION_BOTTOM(state));
         return;
       case 's': // Query DECSLRM
-        vterm_push_output_sprintf_dcs(state->vt, "1$r%d;%ds", SCROLLREGION_LEFT(state)+1, SCROLLREGION_RIGHT(state));
+        vterm_push_output_sprintf_dcs(vt, "1$r%d;%ds", SCROLLREGION_LEFT(state)+1, SCROLLREGION_RIGHT(state));
         return;
     }
 
@@ -1525,11 +1581,11 @@ static void request_status_string(VTermState *state, const char *command, size_t
       }
       if(state->mode.cursor_blink)
         reply--;
-      vterm_push_output_sprintf_dcs(state->vt, "1$r%d q", reply);
+      vterm_push_output_sprintf_dcs(vt, "1$r%d q", reply);
       return;
     }
     else if(strneq(command, "\"q", 2)) {
-      vterm_push_output_sprintf_dcs(state->vt, "1$r%d\"q", state->protected_cell ? 1 : 2);
+      vterm_push_output_sprintf_dcs(vt, "1$r%d\"q", state->protected_cell ? 1 : 2);
       return;
     }
   }
@@ -1681,6 +1737,7 @@ void vterm_state_reset(VTermState *state, int hard)
   state->mode.origin          = 0;
   state->mode.leftrightmargin = 0;
   state->mode.bracketpaste    = 0;
+  state->mode.report_focus    = 0;
 
   state->vt->mode.ctrl8bit   = 0;
 
@@ -1817,9 +1874,24 @@ int vterm_state_set_termprop(VTermState *state, VTermProp prop, VTermValue *val)
     if(val->number == VTERM_PROP_MOUSE_MOVE)
       state->mouse_flags |= MOUSE_WANT_MOVE;
     return 1;
+
+  case VTERM_N_PROPS:
+    return 0;
   }
 
   return 0;
+}
+
+void vterm_state_focus_in(VTermState *state)
+{
+  if(state->mode.report_focus)
+    vterm_push_output_sprintf_ctrl(state->vt, C1_CSI, "I");
+}
+
+void vterm_state_focus_out(VTermState *state)
+{
+  if(state->mode.report_focus)
+    vterm_push_output_sprintf_ctrl(state->vt, C1_CSI, "O");
 }
 
 const VTermLineInfo *vterm_state_get_lineinfo(const VTermState *state, int row)

@@ -23,15 +23,41 @@ static enum {
   FORMAT_SGR,
 } format = FORMAT_PLAIN;
 
-static int col2index(VTermColor target)
+static int dump_cell_color(const VTermColor *col, int sgri, int sgr[], int fg)
 {
-  for(int index = 0; index < 256; index++) {
-    VTermColor col;
-    vterm_state_get_palette_color(NULL, index, &col);
-    if(col.red == target.red && col.green == target.green && col.blue == target.blue)
-      return index;
-  }
-  return -1;
+    /* Reset the color if the given color is the default color */
+    if (fg && VTERM_COLOR_IS_DEFAULT_FG(col)) {
+        sgr[sgri++] = 39;
+        return sgri;
+    }
+    if (!fg && VTERM_COLOR_IS_DEFAULT_BG(col)) {
+        sgr[sgri++] = 49;
+        return sgri;
+    }
+
+    /* Decide whether to send an indexed color or an RGB color */
+    if (VTERM_COLOR_IS_INDEXED(col)) {
+        const uint8_t idx = col->indexed.idx;
+        if (idx < 8) {
+            sgr[sgri++] = (idx + (fg ? 30 : 40));
+        }
+        else if (idx < 16) {
+            sgr[sgri++] = (idx - 8 + (fg ? 90 : 100));
+        }
+        else {
+            sgr[sgri++] = (fg ? 38 : 48);
+            sgr[sgri++] = 5;
+            sgr[sgri++] = idx;
+        }
+    }
+    else if (VTERM_COLOR_IS_RGB(col)) {
+        sgr[sgri++] = (fg ? 38 : 48);
+        sgr[sgri++] = 2;
+        sgr[sgri++] = col->rgb.red;
+        sgr[sgri++] = col->rgb.green;
+        sgr[sgri++] = col->rgb.blue;
+    }
+    return sgri;
 }
 
 static void dump_cell(const VTermScreenCell *cell, const VTermScreenCell *prevcell)
@@ -42,8 +68,8 @@ static void dump_cell(const VTermScreenCell *cell, const VTermScreenCell *prevce
     case FORMAT_SGR:
       {
         // If all 7 attributes change, that means 7 SGRs max
-        // Each colour could consume up to 3
-        int sgr[7 + 2*3]; int sgri = 0;
+        // Each colour could consume up to 5 entries
+        int sgr[7 + 2*5]; int sgri = 0;
 
         if(!prevcell->attrs.bold && cell->attrs.bold)
           sgr[sgri++] = 1;
@@ -80,49 +106,23 @@ static void dump_cell(const VTermScreenCell *cell, const VTermScreenCell *prevce
         if(prevcell->attrs.font && !cell->attrs.font)
           sgr[sgri++] = 10;
 
-        if(prevcell->fg.red   != cell->fg.red   ||
-            prevcell->fg.green != cell->fg.green ||
-            prevcell->fg.blue  != cell->fg.blue) {
-          int index = col2index(cell->fg);
-          if(index == -1)
-            sgr[sgri++] = 39;
-          else if(index < 8)
-            sgr[sgri++] = 30 + index;
-          else if(index < 16)
-            sgr[sgri++] = 90 + (index - 8);
-          else {
-            sgr[sgri++] = 38;
-            sgr[sgri++] = 5 | (1<<31);
-            sgr[sgri++] = index | (1<<31);
-          }
+        if(!vterm_color_is_equal(&prevcell->fg, &cell->fg)) {
+          sgri = dump_cell_color(&cell->fg, sgri, sgr, 1);
         }
 
-        if(prevcell->bg.red   != cell->bg.red   ||
-            prevcell->bg.green != cell->bg.green ||
-            prevcell->bg.blue  != cell->bg.blue) {
-          int index = col2index(cell->bg);
-          if(index == -1)
-            sgr[sgri++] = 49;
-          else if(index < 8)
-            sgr[sgri++] = 40 + index;
-          else if(index < 16)
-            sgr[sgri++] = 100 + (index - 8);
-          else {
-            sgr[sgri++] = 48;
-            sgr[sgri++] = 5 | (1<<31);
-            sgr[sgri++] = index | (1<<31);
-          }
+        if(!vterm_color_is_equal(&prevcell->bg, &cell->bg)) {
+          sgri = dump_cell_color(&cell->bg, sgri, sgr, 0);
         }
 
         if(!sgri)
           break;
 
-        printf("\e[");
+        printf("\x1b[");
         for(int i = 0; i < sgri; i++)
           printf(!i               ? "%d" :
-              sgr[i] & (1<<31) ? ":%d" :
+              CSI_ARG_HAS_MORE(sgr[i]) ? ":%d" :
               ";%d",
-              sgr[i] & ~(1<<31));
+              CSI_ARG(sgr[i]));
         printf("m");
       }
       break;
@@ -144,7 +144,7 @@ static void dump_eol(const VTermScreenCell *prevcell)
       if(prevcell->attrs.bold || prevcell->attrs.underline || prevcell->attrs.italic ||
          prevcell->attrs.blink || prevcell->attrs.reverse || prevcell->attrs.strike ||
          prevcell->attrs.font)
-        printf("\e[m");
+        printf("\x1b[m");
       break;
   }
 
@@ -154,7 +154,7 @@ static void dump_eol(const VTermScreenCell *prevcell)
 void dump_row(int row)
 {
   VTermPos pos = { .row = row, .col = 0 };
-  VTermScreenCell prevcell = {};
+  VTermScreenCell prevcell = { 0 };
   vterm_state_get_default_colors(vterm_obtain_state(vt), &prevcell.fg, &prevcell.bg);
 
   while(pos.col < cols) {
@@ -172,7 +172,7 @@ void dump_row(int row)
 
 static int screen_sb_pushline(int cols, const VTermScreenCell *cells, void *user)
 {
-  VTermScreenCell prevcell = {};
+  VTermScreenCell prevcell = { 0 };
   vterm_state_get_default_colors(vterm_obtain_state(vt), &prevcell.fg, &prevcell.bg);
 
   for(int col = 0; col < cols; col++) {
@@ -258,4 +258,6 @@ int main(int argc, char *argv[])
   close(fd);
 
   vterm_free(vt);
+
+  return 0;
 }

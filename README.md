@@ -6,11 +6,9 @@ terminal emulator"
 
 # How to build
 
-    (cd vendor/libvterm; make)
-    cargo build
+Just run
 
-The make part in libvterm runs a perl script to transform some files in
-libvterm/src/encoding.
+    cargo build
 
 # How to turn on libvterm debugging
 
