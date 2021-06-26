@@ -1,4 +1,4 @@
-use {ColorPalette, ColorRGB, GlyphInfo, Pos, Rect, ScreenCell, Size};
+use crate::prelude::*;
 
 #[derive(PartialEq, Debug, Clone)]
 pub struct AltScreenEvent {

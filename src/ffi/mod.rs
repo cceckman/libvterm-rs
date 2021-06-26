@@ -14,6 +14,8 @@ pub use self::vterm::*;
 
 use libc::c_int;
 
+pub use crate::prelude::*;
+
 pub const VTERM_MAX_CHARS_PER_CELL: usize = 6;
 
 #[derive(Debug)]
@@ -41,15 +43,15 @@ pub struct VTermPos {
 }
 
 impl VTermPos {
-    pub fn from_pos(pos: &::Pos) -> VTermPos {
+    pub fn from_pos(pos: &Pos) -> VTermPos {
         VTermPos {
             col: pos.x as i32,
             row: pos.y as i32,
         }
     }
 
-    pub fn as_pos(&self) -> ::Pos {
-        ::Pos {
+    pub fn as_pos(&self) -> Pos {
+        Pos {
             x: self.col as usize,
             y: self.row as usize,
         }
@@ -65,8 +67,8 @@ pub struct VTermColor {
 }
 
 impl VTermColor {
-    pub fn as_color_rgb(&self) -> ::ColorRGB {
-        ::ColorRGB {
+    pub fn as_color_rgb(&self) -> ColorRGB {
+        ColorRGB {
             red: self.red,
             green: self.green,
             blue: self.blue,
@@ -85,7 +87,7 @@ pub struct VTermRect {
 }
 
 impl VTermRect {
-    pub fn from_rect(rect: &::Rect) -> VTermRect {
+    pub fn from_rect(rect: &Rect) -> VTermRect {
         VTermRect {
             start_col: rect.origin.x as i32,
             start_row: rect.origin.y as i32,
@@ -94,13 +96,13 @@ impl VTermRect {
         }
     }
 
-    pub fn as_rect(&self) -> ::Rect {
-        ::Rect {
-            origin: ::Pos {
+    pub fn as_rect(&self) -> Rect {
+        Rect {
+            origin: Pos {
                 x: self.start_col as usize,
                 y: self.start_row as usize,
             },
-            size: ::Size {
+            size: Size {
                 width: (self.end_col - self.start_col) as usize,
                 height: (self.end_row - self.start_row) as usize,
             },

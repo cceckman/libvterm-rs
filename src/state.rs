@@ -160,7 +160,7 @@ impl VTerm {
 
     pub fn state_reset(&mut self, hard: bool) {
         unsafe {
-            ffi::vterm_state_reset(self.state_ptr.as_mut(), ::bool_to_int(hard));
+            ffi::vterm_state_reset(self.state_ptr.as_mut(), bool_to_int(hard));
         }
     }
 
@@ -169,57 +169,57 @@ impl VTerm {
 
         // Note: Some of these seem to be required or libvterm will segfault
         callbacks.put_glyph = if config.put_glyph {
-            Some(::state_callbacks::put_glyph)
+            Some(state_callbacks::put_glyph)
         } else {
             None
         };
         callbacks.move_cursor = if config.move_cursor {
-            Some(::state_callbacks::move_cursor)
+            Some(state_callbacks::move_cursor)
         } else {
             None
         };
         callbacks.scroll_rect = if config.scroll_rect {
-            Some(::state_callbacks::scroll_rect)
+            Some(state_callbacks::scroll_rect)
         } else {
             None
         };
         callbacks.move_rect = if config.move_rect {
-            Some(::state_callbacks::move_rect)
+            Some(state_callbacks::move_rect)
         } else {
             None
         };
         callbacks.erase = if config.erase {
-            Some(::state_callbacks::erase)
+            Some(state_callbacks::erase)
         } else {
             None
         };
         callbacks.init_pen = if config.init_pen {
-            Some(::state_callbacks::init_pen)
+            Some(state_callbacks::init_pen)
         } else {
             None
         };
         callbacks.set_pen_attr = if config.set_pen_attr {
-            Some(::state_callbacks::set_pen_attr)
+            Some(state_callbacks::set_pen_attr)
         } else {
             None
         };
         callbacks.set_term_prop = if config.set_term_prop {
-            Some(::state_callbacks::set_term_prop)
+            Some(state_callbacks::set_term_prop)
         } else {
             None
         };
         callbacks.bell = if config.bell {
-            Some(::state_callbacks::bell)
+            Some(state_callbacks::bell)
         } else {
             None
         };
         callbacks.resize = if config.resize {
-            Some(::state_callbacks::resize)
+            Some(state_callbacks::resize)
         } else {
             None
         };
         callbacks.set_line_info = if config.set_line_info {
-            Some(::state_callbacks::set_line_info)
+            Some(state_callbacks::set_line_info)
         } else {
             None
         };

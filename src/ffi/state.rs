@@ -92,29 +92,29 @@ extern "C" {
 
 mod tests {
     #![allow(unused_imports)]
-    use super::*;
+    use crate::ffi;
 
     #[test]
     fn ffi_state_can_get_and_set_default_colors() {
         unsafe {
-            let vterm_ptr: *mut ::ffi::VTerm = ::ffi::vterm_new(2, 2);
-            let state_ptr = vterm_obtain_state(vterm_ptr);
+            let vterm_ptr: *mut ffi::VTerm = ffi::vterm_new(2, 2);
+            let state_ptr = ffi::vterm_obtain_state(vterm_ptr);
 
-            let fg = ::ffi::VTermColor {
+            let fg = ffi::VTermColor {
                 red: 200,
                 green: 201,
                 blue: 202,
             };
-            let bg = ::ffi::VTermColor {
+            let bg = ffi::VTermColor {
                 red: 10,
                 green: 11,
                 blue: 12,
             };
-            vterm_state_set_default_colors(state_ptr, &fg, &bg);
+            ffi::vterm_state_set_default_colors(state_ptr, &fg, &bg);
 
-            let mut fg: ::ffi::VTermColor = Default::default();
-            let mut bg: ::ffi::VTermColor = Default::default();
-            vterm_state_get_default_colors(state_ptr, &mut fg, &mut bg);
+            let mut fg: ffi::VTermColor = Default::default();
+            let mut bg: ffi::VTermColor = Default::default();
+            ffi::vterm_state_get_default_colors(state_ptr, &mut fg, &mut bg);
 
             assert_eq!(fg.red, 200);
             assert_eq!(fg.green, 201);
@@ -124,7 +124,7 @@ mod tests {
             assert_eq!(bg.green, 11);
             assert_eq!(bg.blue, 12);
 
-            ::ffi::vterm_free(vterm_ptr);
+            ffi::vterm_free(vterm_ptr);
         }
     }
 }

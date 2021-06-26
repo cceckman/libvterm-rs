@@ -1,6 +1,6 @@
+use crate::support::CapBuilder;
 use std::io::prelude::*;
 use std::sync::mpsc::Receiver;
-use support::CapBuilder;
 use term::terminfo::TermInfo;
 use vterm_sys::*;
 

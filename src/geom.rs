@@ -1,5 +1,3 @@
-use euclid;
-
 pub type Size = euclid::Size2D<usize>;
 pub type Pos = euclid::Point2D<usize>;
 pub type Rect = euclid::Rect<usize>;

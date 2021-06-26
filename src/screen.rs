@@ -172,42 +172,42 @@ impl VTerm {
         let mut callbacks: ffi::VTermScreenCallbacks = Default::default();
 
         callbacks.damage = if config.damage {
-            Some(::screen_callbacks::damage)
+            Some(screen_callbacks::damage)
         } else {
             None
         };
         callbacks.move_rect = if config.move_rect {
-            Some(::screen_callbacks::move_rect)
+            Some(screen_callbacks::move_rect)
         } else {
             None
         };
         callbacks.move_cursor = if config.move_cursor {
-            Some(::screen_callbacks::move_cursor)
+            Some(screen_callbacks::move_cursor)
         } else {
             None
         };
         callbacks.set_term_prop = if config.set_term_prop {
-            Some(::screen_callbacks::set_term_prop)
+            Some(screen_callbacks::set_term_prop)
         } else {
             None
         };
         callbacks.bell = if config.bell {
-            Some(::screen_callbacks::bell)
+            Some(screen_callbacks::bell)
         } else {
             None
         };
         callbacks.resize = if config.resize {
-            Some(::screen_callbacks::resize)
+            Some(screen_callbacks::resize)
         } else {
             None
         };
         callbacks.sb_pushline = if config.sb_pushline {
-            Some(::screen_callbacks::sb_pushline)
+            Some(screen_callbacks::sb_pushline)
         } else {
             None
         };
         callbacks.sb_popline = if config.sb_popline {
-            Some(::screen_callbacks::sb_popline)
+            Some(screen_callbacks::sb_popline)
         } else {
             None
         };

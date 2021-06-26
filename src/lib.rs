@@ -24,6 +24,10 @@ pub use screen_cell::*;
 pub use state::*;
 pub use vterm::*;
 
+mod prelude {
+    pub use crate::{ColorPalette, ColorRGB, GlyphInfo, Pos, Rect, ScreenCell, Size};
+}
+
 pub fn int_to_bool(val: c_int) -> bool {
     match val {
         0 => false,

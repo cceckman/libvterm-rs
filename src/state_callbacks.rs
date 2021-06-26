@@ -13,7 +13,7 @@ pub extern "C" fn put_glyph(
 ) -> c_int {
     cast_vterm(vterm, |vterm, tx| {
         let event = StateEvent::PutGlyph(PutGlyphEvent {
-            glyph_info: ::GlyphInfo::from_ptr(info),
+            glyph_info: GlyphInfo::from_ptr(info),
             pos: pos.as_pos(),
         });
 
