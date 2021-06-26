@@ -62,9 +62,9 @@ impl<'a, 'b> CapBuilder<'a, 'b> {
     }
 
     fn build_with_variables(self) -> Result<Vec<u8>, String> {
-        let variables = try! { self.variables.ok_or("oops, expected variables to be defined") };
-        let cap = try! { self.cap.ok_or("invalid configuration: cap not provided") };
-        let cmd = try! { self.terminfo.strings.get(&cap).ok_or("cap doesn't exist") };
+        let variables = self.variables.ok_or("oops, expected variables to be defined")?;
+        let cap = self.cap.ok_or("invalid configuration: cap not provided")?;
+        let cmd = self.terminfo.strings.get(&cap).ok_or("cap doesn't exist")?;
 
         parm::expand(&cmd, self.params.as_slice(), variables)
             .or_else(|e| Err(format!("error expanding: {}", e)))
@@ -72,8 +72,8 @@ impl<'a, 'b> CapBuilder<'a, 'b> {
 
     fn build_without_variables(self) -> Result<Vec<u8>, String> {
         let mut variables = parm::Variables::new();
-        let cap = try! { self.cap.ok_or("invalid configuration: cap not provided") };
-        let cmd = try! { self.terminfo.strings.get(&cap).ok_or("cap doesn't exist") };
+        let cap = self.cap.ok_or("invalid configuration: cap not provided")?;
+        let cmd = self.terminfo.strings.get(&cap).ok_or("cap doesn't exist")?;
         parm::expand(&cmd, self.params.as_slice(), &mut variables)
             .or_else(|e| Err(format!("error expanding: {}", e)))
     }
