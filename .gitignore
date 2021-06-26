@@ -4,7 +4,8 @@ vendor/**/*.o
 vendor/**/*.la
 vendor/**/*.lo
 
-vendor/libvterm/.libs
+vendor/libvterm/.libs/
+vendor/libvterm/bin/.libs/
 vendor/libvterm/bin/unterm
 vendor/libvterm/bin/vterm-ctrl
 vendor/libvterm/bin/vterm-dump
