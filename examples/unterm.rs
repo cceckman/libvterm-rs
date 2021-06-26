@@ -1,7 +1,8 @@
 extern crate docopt;
-extern crate rustc_serialize;
+extern crate serde;
 extern crate vterm_sys;
 
+use serde::Deserialize;
 use std::io::prelude::*;
 use vterm_sys::*;
 
@@ -178,7 +179,7 @@ Options:
 -f <format>    plain or sgr
 ";
 
-#[derive(Debug, RustcDecodable)]
+#[derive(Debug, Deserialize)]
 struct Args {
     flag_c: usize,
     flag_l: usize,
@@ -188,7 +189,7 @@ struct Args {
 
 fn main() {
     let mut args: Args = docopt::Docopt::new(USAGE)
-        .and_then(|d| d.decode())
+        .and_then(|d| d.deserialize())
         .unwrap_or_else(|e| e.exit());
 
     args.flag_l = if args.flag_l != 0 { args.flag_l } else { 25 };
