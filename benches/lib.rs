@@ -1,11 +1,11 @@
 #![feature(test)]
 
-extern crate vterm_sys;
 extern crate test;
+extern crate vterm_sys;
 
-use vterm_sys::*;
 use std::io::prelude::*;
 use test::Bencher;
+use vterm_sys::*;
 
 // This seems pretty fast! 17,000ns per write.
 #[bench]

@@ -1,4 +1,4 @@
-use {Size, ScreenCell, GlyphInfo, Rect, Pos, ColorRGB, ColorPalette};
+use {ColorPalette, ColorRGB, GlyphInfo, Pos, Rect, ScreenCell, Size};
 
 #[derive(PartialEq, Debug, Clone)]
 pub struct AltScreenEvent {

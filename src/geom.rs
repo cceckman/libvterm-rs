@@ -36,8 +36,10 @@ impl RectAssist for Rect {
     }
 
     fn contains_rect(&self, other: &Rect) -> bool {
-        self.top() <= other.top() && self.bottom() >= other.bottom() &&
-        self.left() <= other.left() && self.right() >= other.right()
+        self.top() <= other.top()
+            && self.bottom() >= other.bottom()
+            && self.left() <= other.left()
+            && self.right() >= other.right()
     }
 }
 
@@ -87,11 +89,13 @@ mod tests {
 
     #[test]
     fn rect_positions_will_iterate() {
-        let rect = Rect::new(Pos { x: 0, y: 0 },
-                             Size {
-                                 width: 2,
-                                 height: 3,
-                             });
+        let rect = Rect::new(
+            Pos { x: 0, y: 0 },
+            Size {
+                width: 2,
+                height: 3,
+            },
+        );
         let mut iter = rect.positions();
         assert_eq!(iter.next(), Some(Pos { x: 0, y: 0 }));
         assert_eq!(iter.next(), Some(Pos { x: 1, y: 0 }));

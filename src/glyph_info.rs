@@ -1,5 +1,5 @@
+use libc::size_t;
 use std::vec::Vec;
-use libc::{size_t};
 
 use super::*;
 
@@ -9,16 +9,18 @@ pub struct GlyphInfo {
     pub width: isize,
     pub protected_cell: bool,
     pub dwl: bool, // On a DECDWL or DECDHL line
-    pub dhl: u8, // On a DECDHL line (1=top 2=bottom)
+    pub dhl: u8,   // On a DECDHL line (1=top 2=bottom)
 }
 
 impl GlyphInfo {
     pub fn from_ptr(ptr: *const ffi::VTermGlyphInfo) -> GlyphInfo {
         let mut buf = [0 as u32; ffi::VTERM_MAX_CHARS_PER_CELL];
         let chars_count = unsafe {
-            ffi::vterm_glyph_info_get_chars(ptr,
-                                            buf.as_mut_ptr(),
-                                            ffi::VTERM_MAX_CHARS_PER_CELL as size_t)
+            ffi::vterm_glyph_info_get_chars(
+                ptr,
+                buf.as_mut_ptr(),
+                ffi::VTERM_MAX_CHARS_PER_CELL as size_t,
+            )
         };
         let buf: [u8; ffi::VTERM_MAX_CHARS_PER_CELL * 4] = unsafe { ::std::mem::transmute(buf) };
         let mut chars: Vec<u8> = vec![];

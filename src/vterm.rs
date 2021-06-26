@@ -1,7 +1,7 @@
 use libc::{c_int, size_t};
-use std::sync::mpsc;
-use std::ptr::NonNull;
 use std::io::prelude::*;
+use std::ptr::NonNull;
+use std::sync::mpsc;
 
 use super::*;
 
@@ -22,9 +22,8 @@ pub struct VTerm {
 impl VTerm {
     /// Attempt to create a new VTerm of the given size.
     pub fn new(size: &Size) -> Option<VTerm> {
-        let mut vterm_ptr = unsafe {
-            NonNull::new(ffi::vterm_new(size.height as c_int, size.width as c_int))?
-        };
+        let mut vterm_ptr =
+            unsafe { NonNull::new(ffi::vterm_new(size.height as c_int, size.width as c_int))? };
         let screen_ptr = unsafe { NonNull::new(ffi::vterm_obtain_screen(vterm_ptr.as_mut()))? };
         let state_ptr = unsafe { NonNull::new(ffi::vterm_obtain_state(vterm_ptr.as_mut()))? };
 
@@ -60,9 +59,7 @@ impl VTerm {
 
     pub fn set_size(&mut self, size: &Size) {
         unsafe {
-            ffi::vterm_set_size(self.ptr.as_mut(),
-                                size.height as c_int,
-                                size.width as c_int);
+            ffi::vterm_set_size(self.ptr.as_mut(), size.height as c_int, size.width as c_int);
         }
     }
 
@@ -105,7 +102,8 @@ mod tests {
         let vterm: VTerm = VTerm::new(&Size {
             height: 2,
             width: 2,
-        }).unwrap();
+        })
+        .unwrap();
         drop(vterm);
     }
 
@@ -114,7 +112,8 @@ mod tests {
         let vterm: VTerm = VTerm::new(&Size {
             height: 2,
             width: 3,
-        }).unwrap();
+        })
+        .unwrap();
         let size = vterm.get_size();
         assert_eq!((2, 3), (size.height, size.width));
     }
@@ -124,7 +123,8 @@ mod tests {
         let mut vterm: VTerm = VTerm::new(&Size {
             height: 2,
             width: 3,
-        }).unwrap();
+        })
+        .unwrap();
         vterm.set_size(&Size {
             height: 1,
             width: 2,
@@ -138,7 +138,8 @@ mod tests {
         let mut vterm: VTerm = VTerm::new(&Size {
             height: 2,
             width: 2,
-        }).unwrap();
+        })
+        .unwrap();
         vterm.set_utf8(true);
         assert_eq!(true, vterm.get_utf8());
 
@@ -151,7 +152,8 @@ mod tests {
         let mut vterm: VTerm = VTerm::new(&Size {
             height: 2,
             width: 2,
-        }).unwrap();
+        })
+        .unwrap();
         let input: &[u8] = "abcd".as_bytes();
         let result = vterm.write(input);
         assert!(result.is_ok());

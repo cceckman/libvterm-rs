@@ -1,15 +1,16 @@
 #![allow(unused_variables)]
 
 use libc::{c_int, c_void};
-use std::sync::mpsc::Sender;
 use std::ffi::CStr;
+use std::sync::mpsc::Sender;
 
 use super::*;
 
-pub extern "C" fn put_glyph(info: *mut ffi::VTermGlyphInfo,
-                            pos: ffi::VTermPos,
-                            vterm: *mut c_void)
-                            -> c_int {
+pub extern "C" fn put_glyph(
+    info: *mut ffi::VTermGlyphInfo,
+    pos: ffi::VTermPos,
+    vterm: *mut c_void,
+) -> c_int {
     cast_vterm(vterm, |vterm, tx| {
         let event = StateEvent::PutGlyph(PutGlyphEvent {
             glyph_info: ::GlyphInfo::from_ptr(info),
@@ -23,11 +24,12 @@ pub extern "C" fn put_glyph(info: *mut ffi::VTermGlyphInfo,
     })
 }
 
-pub extern "C" fn move_cursor(new: ffi::VTermPos,
-                              old: ffi::VTermPos,
-                              visible: c_int,
-                              vterm: *mut c_void)
-                              -> c_int {
+pub extern "C" fn move_cursor(
+    new: ffi::VTermPos,
+    old: ffi::VTermPos,
+    visible: c_int,
+    vterm: *mut c_void,
+) -> c_int {
     cast_vterm(vterm, |vterm, tx| {
         let event = StateEvent::MoveCursor(MoveCursorEvent {
             new: new.as_pos(),
@@ -42,11 +44,12 @@ pub extern "C" fn move_cursor(new: ffi::VTermPos,
     })
 }
 
-pub extern "C" fn scroll_rect(rect: ffi::VTermRect,
-                              downward: c_int,
-                              rightward: c_int,
-                              vterm: *mut c_void)
-                              -> c_int {
+pub extern "C" fn scroll_rect(
+    rect: ffi::VTermRect,
+    downward: c_int,
+    rightward: c_int,
+    vterm: *mut c_void,
+) -> c_int {
     cast_vterm(vterm, |vterm, tx| {
         let event = StateEvent::ScrollRect(ScrollRectEvent {
             rect: rect.as_rect(),
@@ -61,10 +64,11 @@ pub extern "C" fn scroll_rect(rect: ffi::VTermRect,
     })
 }
 
-pub extern "C" fn move_rect(dest: ffi::VTermRect,
-                            src: ffi::VTermRect,
-                            vterm: *mut c_void)
-                            -> c_int {
+pub extern "C" fn move_rect(
+    dest: ffi::VTermRect,
+    src: ffi::VTermRect,
+    vterm: *mut c_void,
+) -> c_int {
     cast_vterm(vterm, |vterm, tx| {
         let event = StateEvent::MoveRect(MoveRectEvent {
             src: src.as_rect(),
@@ -102,10 +106,11 @@ pub extern "C" fn init_pen(vterm: *mut c_void) -> c_int {
     })
 }
 
-pub extern "C" fn set_pen_attr(attr: ffi::VTermAttr,
-                               val: *mut ffi::VTermValue,
-                               vterm: *mut c_void)
-                               -> c_int {
+pub extern "C" fn set_pen_attr(
+    attr: ffi::VTermAttr,
+    val: *mut ffi::VTermValue,
+    vterm: *mut c_void,
+) -> c_int {
     cast_vterm(vterm, |vterm, tx| {
         let event: StateEvent = match attr {
             ffi::VTermAttr::Bold => {
@@ -161,10 +166,11 @@ pub extern "C" fn set_pen_attr(attr: ffi::VTermAttr,
     })
 }
 
-pub extern "C" fn set_term_prop(prop: ffi::VTermProp,
-                                val: *mut ffi::VTermValue,
-                                vterm: *mut c_void)
-                                -> c_int {
+pub extern "C" fn set_term_prop(
+    prop: ffi::VTermProp,
+    val: *mut ffi::VTermValue,
+    vterm: *mut c_void,
+) -> c_int {
     cast_vterm(vterm, |vterm, tx| {
         let event: StateEvent = match prop {
             ffi::VTermProp::VTermPropCursorVisible => {
@@ -183,23 +189,23 @@ pub extern "C" fn set_term_prop(prop: ffi::VTermProp,
             }
 
             ffi::VTermProp::VTermPropCursorShape => {
-                let val: CursorShape = unsafe {
-                    CursorShape::from_i32(ffi::vterm_value_get_number(val))
-                };
+                let val: CursorShape =
+                    unsafe { CursorShape::from_i32(ffi::vterm_value_get_number(val)) };
                 StateEvent::CursorShape(CursorShapeEvent { shape: val })
             }
 
             ffi::VTermProp::VTermPropIconName => {
                 let val: String = unsafe {
-                    CStr::from_ptr(ffi::vterm_value_get_string(val)).to_string_lossy().into_owned()
+                    CStr::from_ptr(ffi::vterm_value_get_string(val))
+                        .to_string_lossy()
+                        .into_owned()
                 };
                 StateEvent::IconName(IconNameEvent { name: val })
             }
 
             ffi::VTermProp::VTermPropMouse => {
-                let val: MouseMode = unsafe {
-                    MouseMode::from_i32(ffi::vterm_value_get_number(val))
-                };
+                let val: MouseMode =
+                    unsafe { MouseMode::from_i32(ffi::vterm_value_get_number(val)) };
                 StateEvent::Mouse(MouseEvent { mode: val })
             }
 
@@ -210,7 +216,9 @@ pub extern "C" fn set_term_prop(prop: ffi::VTermProp,
 
             ffi::VTermProp::VTermPropTitle => {
                 let val: String = unsafe {
-                    CStr::from_ptr(ffi::vterm_value_get_string(val)).to_string_lossy().into_owned()
+                    CStr::from_ptr(ffi::vterm_value_get_string(val))
+                        .to_string_lossy()
+                        .into_owned()
                 };
                 StateEvent::Title(TitleEvent { title: val })
             }
@@ -233,11 +241,12 @@ pub extern "C" fn bell(vterm: *mut c_void) -> c_int {
     })
 }
 
-pub extern "C" fn resize(rows: c_int,
-                         cols: c_int,
-                         delta: *mut ffi::VTermPos,
-                         vterm: *mut c_void)
-                         -> c_int {
+pub extern "C" fn resize(
+    rows: c_int,
+    cols: c_int,
+    delta: *mut ffi::VTermPos,
+    vterm: *mut c_void,
+) -> c_int {
     // NOTE: libvterm expects a synchronise api here and wants us to mutate delta based on how we
     // choose to scroll or something. But we can't do that can we?
 
@@ -251,11 +260,12 @@ pub extern "C" fn resize(rows: c_int,
         }
     })
 }
-pub extern "C" fn set_line_info(row: c_int,
-                                new: *const ffi::VTermLineInfo,
-                                old: *const ffi::VTermLineInfo,
-                                vterm: *mut c_void)
-                                -> c_int {
+pub extern "C" fn set_line_info(
+    row: c_int,
+    new: *const ffi::VTermLineInfo,
+    old: *const ffi::VTermLineInfo,
+    vterm: *mut c_void,
+) -> c_int {
     cast_vterm(vterm, |vterm, tx| {
         let event = StateEvent::LineInfo(LineInfoEvent {
             row: row, // TODO: add line info data as well
@@ -269,7 +279,8 @@ pub extern "C" fn set_line_info(row: c_int,
 
 /// Call the given closure with the vterms sender, if it exists.
 fn cast_vterm<F>(vterm: *mut c_void, closure: F) -> c_int
-    where F: Fn(&VTerm, &Sender<StateEvent>) -> c_int
+where
+    F: Fn(&VTerm, &Sender<StateEvent>) -> c_int,
 {
     let vterm: &VTerm = unsafe { &mut *(vterm as *mut VTerm) };
     match vterm.state_event_tx.as_ref() {

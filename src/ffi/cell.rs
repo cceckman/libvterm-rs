@@ -1,5 +1,5 @@
-use libc::{c_int, c_uint, size_t, c_char};
 use super::VTermColor;
+use libc::{c_char, c_int, c_uint, size_t};
 
 pub enum VTermScreenCell {}
 
@@ -10,10 +10,11 @@ extern "C" {
     // These are my rust ffi bitfield workarounds
     pub fn vterm_cell_new() -> *mut VTermScreenCell;
     pub fn vterm_cell_free(cell: *mut VTermScreenCell);
-    pub fn vterm_cell_get_chars(cell: *const VTermScreenCell,
-                                chars: *mut u32,
-                                len: size_t)
-                                -> c_int;
+    pub fn vterm_cell_get_chars(
+        cell: *const VTermScreenCell,
+        chars: *mut u32,
+        len: size_t,
+    ) -> c_int;
     pub fn vterm_cell_set_chars(cell: *mut VTermScreenCell, chars: *const u32, len: size_t);
     pub fn vterm_cell_get_width(cell: *const VTermScreenCell) -> c_char;
     pub fn vterm_cell_set_width(cell: *mut VTermScreenCell, width: c_char);
@@ -39,15 +40,16 @@ extern "C" {
     pub fn vterm_cell_set_fg(cell: *mut VTermScreenCell, color: VTermColor);
     pub fn vterm_cell_get_bg(cell: *const VTermScreenCell) -> VTermColor;
     pub fn vterm_cell_set_bg(cell: *mut VTermScreenCell, color: VTermColor);
-    pub fn vterm_cell_pointer_arithmetic(cell: *const VTermScreenCell,
-                                         amount: c_int)
-                                         -> *const VTermScreenCell;
+    pub fn vterm_cell_pointer_arithmetic(
+        cell: *const VTermScreenCell,
+        amount: c_int,
+    ) -> *const VTermScreenCell;
 }
 
 mod tests {
     #![allow(unused_imports)]
-    use libc::size_t;
     use super::super::*;
+    use libc::size_t;
 
     #[test]
     fn ffi_cell_can_create_and_destroy() {
@@ -62,7 +64,14 @@ mod tests {
         unsafe {
             let cell_ptr: *mut VTermScreenCell = vterm_cell_new();
 
-            let a = [b'a' as u32, b'b' as u32, b'c' as u32, 0 as u32, 0 as u32, 0 as u32];
+            let a = [
+                b'a' as u32,
+                b'b' as u32,
+                b'c' as u32,
+                0 as u32,
+                0 as u32,
+                0 as u32,
+            ];
             vterm_cell_set_chars(cell_ptr, a.as_ptr(), 3);
             let mut b = [0 as u32; VTERM_MAX_CHARS_PER_CELL];
             vterm_cell_get_chars(cell_ptr, b.as_mut_ptr(), VTERM_MAX_CHARS_PER_CELL as size_t);

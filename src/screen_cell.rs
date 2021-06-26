@@ -1,5 +1,5 @@
+use libc::size_t;
 use std::vec::Vec;
-use libc::{size_t};
 
 use super::*;
 
@@ -20,9 +20,9 @@ pub struct ScreenCellAttr {
     pub blink: bool,
     pub reverse: bool,
     pub strike: bool,
-    pub font: u8, // 0 to 9
+    pub font: u8,  // 0 to 9
     pub dwl: bool, // On a DECDWL or DECDHL line
-    pub dhl: u8, // On a DECDHL line (1=top 2=bottom)
+    pub dhl: u8,   // On a DECDHL line (1=top 2=bottom)
 }
 
 #[derive(Debug, PartialEq, Clone)]
@@ -49,9 +49,11 @@ impl ScreenCell {
 
         let mut buf = [0 as u32; ffi::VTERM_MAX_CHARS_PER_CELL];
         let chars_count = unsafe {
-            ffi::vterm_cell_get_chars(ptr,
-                                      buf.as_mut_ptr(),
-                                      ffi::VTERM_MAX_CHARS_PER_CELL as size_t)
+            ffi::vterm_cell_get_chars(
+                ptr,
+                buf.as_mut_ptr(),
+                ffi::VTERM_MAX_CHARS_PER_CELL as size_t,
+            )
         };
         let buf: [u8; ffi::VTERM_MAX_CHARS_PER_CELL * 4] = unsafe { ::std::mem::transmute(buf) };
         let mut chars: Vec<u8> = vec![];

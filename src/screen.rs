@@ -1,4 +1,4 @@
-use libc::{c_void, size_t, c_char};
+use libc::{c_char, c_void, size_t};
 use std::sync::mpsc;
 
 use super::*;
@@ -63,8 +63,8 @@ impl ScreenCallbacksConfig {
 }
 
 pub enum DamageSize {
-    Cell, // every cell
-    Row, // entire rows
+    Cell,   // every cell
+    Row,    // entire rows
     Screen, // entire screen
     Scroll, // entire screen + scrollrect
 }
@@ -79,16 +79,19 @@ impl VTerm {
     pub fn screen_get_cell(&self, pos: &Pos) -> ScreenCell {
         let size = self.get_size();
         if pos.x >= size.width || pos.y >= size.height {
-            panic!("given position out of bounds: size={:?} pos={:?}",
-                   size,
-                   pos);
+            panic!(
+                "given position out of bounds: size={:?} pos={:?}",
+                size, pos
+            );
         }
 
         let cell_buf = unsafe { ffi::vterm_cell_new() };
         unsafe {
-            ffi::vterm_screen_get_cell(self.screen_ptr.as_ref(),
-                                       ffi::VTermPos::from_pos(&pos),
-                                       cell_buf)
+            ffi::vterm_screen_get_cell(
+                self.screen_ptr.as_ref(),
+                ffi::VTermPos::from_pos(&pos),
+                cell_buf,
+            )
         };
         let cell = ScreenCell::from_ptr(cell_buf, &self); // shouldn't this take &cell_buf?
         unsafe { ffi::vterm_cell_free(cell_buf) };
@@ -113,9 +116,11 @@ impl VTerm {
     fn get_text_as_bytes(&self, rect: &Rect) -> Vec<u8> {
         let screen_rect = Rect::new(Pos::new(0, 0), self.get_size());
         if !screen_rect.contains_rect(&rect) {
-            panic!("given rect out of bounds: size={:?} rect={:?}",
-                   self.get_size(),
-                   rect);
+            panic!(
+                "given rect out of bounds: size={:?} rect={:?}",
+                self.get_size(),
+                rect
+            );
         }
 
         let size: usize = rect.size.width * rect.size.height * ffi::VTERM_MAX_CHARS_PER_CELL;
@@ -124,10 +129,12 @@ impl VTerm {
         let bytes_ptr: *mut c_char = (&mut bytes[0..size]).as_mut_ptr();
 
         unsafe {
-            let len = ffi::vterm_screen_get_text(self.screen_ptr.as_ref(),
-                                                 bytes_ptr,
-                                                 size as size_t,
-                                                 ffi::VTermRect::from_rect(&rect));
+            let len = ffi::vterm_screen_get_text(
+                self.screen_ptr.as_ref(),
+                bytes_ptr,
+                size as size_t,
+                ffi::VTermRect::from_rect(&rect),
+            );
             bytes.set_len(len);
         }
 
@@ -215,9 +222,11 @@ impl VTerm {
 
         unsafe {
             let self_ptr: *mut c_void = self as *mut _ as *mut c_void;
-            ffi::vterm_screen_set_callbacks(self.screen_ptr.as_mut(),
-                                            self.screen_callbacks.as_ref().unwrap(),
-                                            self_ptr);
+            ffi::vterm_screen_set_callbacks(
+                self.screen_ptr.as_mut(),
+                self.screen_callbacks.as_ref().unwrap(),
+                self_ptr,
+            );
         }
     }
 }
@@ -231,7 +240,8 @@ mod tests {
         let mut vterm: VTerm = VTerm::new(&Size {
             height: 2,
             width: 2,
-        }).unwrap();
+        })
+        .unwrap();
         vterm.screen_reset(true);
     }
 }

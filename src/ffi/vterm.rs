@@ -1,5 +1,5 @@
-use libc::{c_int, size_t, c_char, c_uchar};
-use super::{VTermModifier, VTermKey};
+use super::{VTermKey, VTermModifier};
+use libc::{c_char, c_int, c_uchar, size_t};
 
 pub enum VTerm {}
 
@@ -28,16 +28,18 @@ extern "C" {
     pub fn vterm_keyboard_end_paste(vt: *mut VTerm);
 
     pub fn vterm_mouse_move(vt: *mut VTerm, row: c_int, col: c_int, modifier: VTermModifier);
-    pub fn vterm_mouse_button(vt: *mut VTerm,
-                              button: c_int,
-                              pressed: bool,
-                              modifier: VTermModifier);
+    pub fn vterm_mouse_button(
+        vt: *mut VTerm,
+        button: c_int,
+        pressed: bool,
+        modifier: VTermModifier,
+    );
 }
 
 mod tests {
     #![allow(unused_imports)]
-    use libc::{c_int, c_uchar};
     use super::*;
+    use libc::{c_int, c_uchar};
 
     #[test]
     fn ffi_vterm_can_create_and_destroy() {

@@ -1,5 +1,5 @@
-use libc::{c_int, c_void};
 use super::*;
+use libc::{c_int, c_void};
 
 pub enum VTermState {}
 
@@ -15,11 +15,9 @@ pub struct VTermStateCallbacks {
     pub set_term_prop: Option<extern "C" fn(VTermProp, *mut VTermValue, *mut c_void) -> (c_int)>,
     pub bell: Option<extern "C" fn(*mut c_void) -> (c_int)>,
     pub resize: Option<extern "C" fn(c_int, c_int, *mut VTermPos, *mut c_void) -> (c_int)>,
-    pub set_line_info: Option<extern "C" fn(c_int,
-                                            *const VTermLineInfo,
-                                            *const VTermLineInfo,
-                                            *mut c_void)
-                                            -> (c_int)>,
+    pub set_line_info: Option<
+        extern "C" fn(c_int, *const VTermLineInfo, *const VTermLineInfo, *mut c_void) -> (c_int),
+    >,
 }
 impl Default for VTermStateCallbacks {
     fn default() -> VTermStateCallbacks {
@@ -42,39 +40,53 @@ impl Default for VTermStateCallbacks {
 extern "C" {
     pub fn vterm_obtain_state(vt: *mut VTerm) -> *mut VTermState;
 
-    pub fn vterm_state_set_callbacks(state: *mut VTermState,
-                                     callbacks: *const VTermStateCallbacks,
-                                     user: *mut c_void);
+    pub fn vterm_state_set_callbacks(
+        state: *mut VTermState,
+        callbacks: *const VTermStateCallbacks,
+        user: *mut c_void,
+    );
     pub fn vterm_state_get_cbdata(state: *mut VTermState) -> *mut c_void;
 
-    pub fn vterm_state_set_unrecognised_fallbacks(state: *mut VTermState,
-                                                  fallbacks: *const VTermParserCallbacks,
-                                                  user: *mut c_void);
+    pub fn vterm_state_set_unrecognised_fallbacks(
+        state: *mut VTermState,
+        fallbacks: *const VTermParserCallbacks,
+        user: *mut c_void,
+    );
     pub fn vterm_state_get_unrecognised_fbdata(state: *mut VTermState) -> *mut c_void;
 
     pub fn vterm_state_reset(state: *mut VTermState, hard: c_int);
     pub fn vterm_state_get_cursorpos(state: *const VTermState, cursorpos: *mut VTermPos);
-    pub fn vterm_state_get_default_colors(state: *const VTermState,
-                                          default_fg: *mut VTermColor,
-                                          default_bg: *mut VTermColor);
-    pub fn vterm_state_get_palette_color(state: *const VTermState,
-                                         index: c_int,
-                                         color: *mut VTermColor);
-    pub fn vterm_state_set_default_colors(state: *mut VTermState,
-                                          default_fg: *const VTermColor,
-                                          default_bg: *const VTermColor);
-    pub fn vterm_state_set_palette_color(state: *mut VTermState,
-                                         index: c_int,
-                                         col: *const VTermColor);
+    pub fn vterm_state_get_default_colors(
+        state: *const VTermState,
+        default_fg: *mut VTermColor,
+        default_bg: *mut VTermColor,
+    );
+    pub fn vterm_state_get_palette_color(
+        state: *const VTermState,
+        index: c_int,
+        color: *mut VTermColor,
+    );
+    pub fn vterm_state_set_default_colors(
+        state: *mut VTermState,
+        default_fg: *const VTermColor,
+        default_bg: *const VTermColor,
+    );
+    pub fn vterm_state_set_palette_color(
+        state: *mut VTermState,
+        index: c_int,
+        col: *const VTermColor,
+    );
     pub fn vterm_state_set_bold_highbright(state: *mut VTermState, bold_is_highbright: c_int);
-    pub fn vterm_state_get_penattr(state: *const VTermState,
-                                   attr: VTermAttr,
-                                   val: *mut VTermValue)
-                                   -> c_int;
-    pub fn vterm_state_set_termprop(state: *mut VTermState,
-                                    prop: VTermProp,
-                                    val: *mut VTermValue)
-                                    -> c_int;
+    pub fn vterm_state_get_penattr(
+        state: *const VTermState,
+        attr: VTermAttr,
+        val: *mut VTermValue,
+    ) -> c_int;
+    pub fn vterm_state_set_termprop(
+        state: *mut VTermState,
+        prop: VTermProp,
+        val: *mut VTermValue,
+    ) -> c_int;
     pub fn vterm_state_get_lineinfo(state: *const VTermState, row: c_int) -> *const VTermLineInfo;
 }
 

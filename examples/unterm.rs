@@ -1,9 +1,9 @@
-extern crate rustc_serialize;
 extern crate docopt;
+extern crate rustc_serialize;
 extern crate vterm_sys;
 
-use vterm_sys::*;
 use std::io::prelude::*;
+use vterm_sys::*;
 
 enum Format {
     Plain,
@@ -72,9 +72,10 @@ fn dump_cell(vterm: &VTerm, cell: &ScreenCell, prev_cell: &ScreenCell, context: 
                 sgrs.push(10);
             }
 
-            if prev_cell.fg_rgb.red != cell.fg_rgb.red ||
-               prev_cell.fg_rgb.green != cell.fg_rgb.green ||
-               prev_cell.fg_rgb.blue != cell.fg_rgb.blue {
+            if prev_cell.fg_rgb.red != cell.fg_rgb.red
+                || prev_cell.fg_rgb.green != cell.fg_rgb.green
+                || prev_cell.fg_rgb.blue != cell.fg_rgb.blue
+            {
                 let index = vterm.state_get_palette_color_from_rgb(&cell.fg_rgb);
                 if index < 8 {
                     sgrs.push(30 + index as usize);
@@ -87,9 +88,10 @@ fn dump_cell(vterm: &VTerm, cell: &ScreenCell, prev_cell: &ScreenCell, context: 
                 }
             }
 
-            if prev_cell.bg_rgb.red != cell.bg_rgb.red ||
-               prev_cell.bg_rgb.green != cell.bg_rgb.green ||
-               prev_cell.bg_rgb.blue != cell.bg_rgb.blue {
+            if prev_cell.bg_rgb.red != cell.bg_rgb.red
+                || prev_cell.bg_rgb.green != cell.bg_rgb.green
+                || prev_cell.bg_rgb.blue != cell.bg_rgb.blue
+            {
                 let index = vterm.state_get_palette_color_from_rgb(&cell.bg_rgb);
                 if index < 8 {
                     sgrs.push(40 + index as usize);
@@ -129,10 +131,14 @@ fn dump_eol(prev_cell: &ScreenCell, context: &Context) {
     match context.format {
         Format::Plain => {}
         Format::Sgr => {
-            if prev_cell.attrs.bold || prev_cell.attrs.underline != 0 ||
-               prev_cell.attrs.italic || prev_cell.attrs.blink ||
-               prev_cell.attrs.reverse || prev_cell.attrs.strike ||
-               prev_cell.attrs.font != 0 {
+            if prev_cell.attrs.bold
+                || prev_cell.attrs.underline != 0
+                || prev_cell.attrs.italic
+                || prev_cell.attrs.blink
+                || prev_cell.attrs.reverse
+                || prev_cell.attrs.strike
+                || prev_cell.attrs.font != 0
+            {
                 print!("\x1b[m");
             }
         }
@@ -182,19 +188,11 @@ struct Args {
 
 fn main() {
     let mut args: Args = docopt::Docopt::new(USAGE)
-                             .and_then(|d| d.decode())
-                             .unwrap_or_else(|e| e.exit());
+        .and_then(|d| d.decode())
+        .unwrap_or_else(|e| e.exit());
 
-    args.flag_l = if args.flag_l != 0 {
-        args.flag_l
-    } else {
-        25
-    };
-    args.flag_c = if args.flag_c != 0 {
-        args.flag_c
-    } else {
-        80
-    };
+    args.flag_l = if args.flag_l != 0 { args.flag_l } else { 25 };
+    args.flag_c = if args.flag_c != 0 { args.flag_c } else { 80 };
     args.flag_f = if args.flag_f.len() != 0 {
         args.flag_f
     } else {
@@ -214,7 +212,8 @@ fn main() {
     let mut vt = VTerm::new(&Size {
         height: context.rows_count,
         width: context.cols_count,
-    }).unwrap();
+    })
+    .unwrap();
 
     vt.set_utf8(true);
 

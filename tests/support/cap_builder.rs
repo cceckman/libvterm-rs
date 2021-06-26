@@ -26,16 +26,15 @@ impl<'a, 'b> CapBuilder<'a, 'b> {
     }
 
     pub fn cap<S>(mut self, cap: S) -> CapBuilder<'a, 'b>
-        where S: Into<String>
+    where
+        S: Into<String>,
     {
         self.cap = Some(cap.into());
         self
     }
 
     #[allow(dead_code)]
-    pub fn variables(mut self,
-                     variables: &'b mut parm::Variables)
-                     -> CapBuilder<'a, 'b> {
+    pub fn variables(mut self, variables: &'b mut parm::Variables) -> CapBuilder<'a, 'b> {
         self.variables = Some(variables);
         self
     }
@@ -47,7 +46,8 @@ impl<'a, 'b> CapBuilder<'a, 'b> {
 
     #[allow(dead_code)]
     pub fn word_param<S>(mut self, val: S) -> CapBuilder<'a, 'b>
-        where S: Into<String>
+    where
+        S: Into<String>,
     {
         self.params.push(parm::Param::Words(val.into()));
         self
@@ -62,7 +62,9 @@ impl<'a, 'b> CapBuilder<'a, 'b> {
     }
 
     fn build_with_variables(self) -> Result<Vec<u8>, String> {
-        let variables = self.variables.ok_or("oops, expected variables to be defined")?;
+        let variables = self
+            .variables
+            .ok_or("oops, expected variables to be defined")?;
         let cap = self.cap.ok_or("invalid configuration: cap not provided")?;
         let cmd = self.terminfo.strings.get(&cap).ok_or("cap doesn't exist")?;
 

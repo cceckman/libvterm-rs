@@ -1,16 +1,16 @@
 mod cell;
+mod glyph_info;
 mod parser;
 mod screen;
 mod state;
 mod vterm;
-mod glyph_info;
 
 pub use self::cell::*;
+pub use self::glyph_info::*;
 pub use self::parser::*;
 pub use self::screen::*;
 pub use self::state::*;
 pub use self::vterm::*;
-pub use self::glyph_info::*;
 
 use libc::c_int;
 
@@ -20,13 +20,13 @@ pub const VTERM_MAX_CHARS_PER_CELL: usize = 6;
 #[repr(C)]
 pub enum VTermProp {
     VTermPropCursorVisible = 1, // bool
-    VTermPropCursorBlink, // bool
-    VTermPropAltscreen, // bool
-    VTermPropTitle, // string
-    VTermPropIconName, // string
-    VTermPropReverse, // bool
-    VTermPropCursorShape, // number
-    VTermPropMouse, // number
+    VTermPropCursorBlink,       // bool
+    VTermPropAltscreen,         // bool
+    VTermPropTitle,             // string
+    VTermPropIconName,          // string
+    VTermPropReverse,           // bool
+    VTermPropCursorShape,       // number
+    VTermPropMouse,             // number
 }
 
 pub enum VTermValue {}
@@ -74,7 +74,6 @@ impl VTermColor {
     }
 }
 
-
 #[repr(C)]
 #[derive(PartialEq, Debug)]
 pub struct VTermRect {
@@ -112,13 +111,13 @@ impl VTermRect {
 #[derive(Debug)]
 #[repr(C)]
 pub enum VTermAttr {
-    Bold = 1, // bool:   1, 22
-    Underline, // number: 4, 21, 24
-    Italic, // bool:   3, 23
-    Blink, // bool:   5, 25
-    Reverse, // bool:   7, 27
-    Strike, // bool:   9, 29
-    Font, // number: 10-19
+    Bold = 1,   // bool:   1, 22
+    Underline,  // number: 4, 21, 24
+    Italic,     // bool:   3, 23
+    Blink,      // bool:   5, 25
+    Reverse,    // bool:   7, 27
+    Strike,     // bool:   9, 29
+    Font,       // number: 10-19
     Foreground, // color:  30-39 90-97
     Background, // color:  40-49 100-107
 }
