@@ -9,7 +9,7 @@ fn state_can_generate_put_glyph_events() {
     let mut vterm: VTerm = VTerm::new(&Size {
         height: 2,
         width: 2,
-    });
+    }).unwrap();
     vterm.state_receive_events(&StateCallbacksConfig::all());
     vterm.write(b"a").unwrap();
 
@@ -28,7 +28,7 @@ fn state_can_generate_move_cursor_events() {
     let mut vterm: VTerm = VTerm::new(&Size {
         height: 2,
         width: 2,
-    });
+    }).unwrap();
     vterm.state_receive_events(&StateCallbacksConfig::all());
 
     let terminfo = TermInfo::from_name("xterm").unwrap();
@@ -54,7 +54,7 @@ fn state_can_generate_scroll_rect_events() {
     let mut vterm: VTerm = VTerm::new(&Size {
         height: 2,
         width: 2,
-    });
+    }).unwrap();
     vterm.state_receive_events(&StateCallbacksConfig::all());
     let terminfo = TermInfo::from_name("xterm").unwrap();
     vterm.write(&CapBuilder::new(&terminfo)
@@ -77,7 +77,7 @@ fn state_can_generate_scroll_rect_events_for_part_of_screen() {
     let mut vterm: VTerm = VTerm::new(&Size {
         height: 5,
         width: 2,
-    });
+    }).unwrap();
     vterm.state_receive_events(&StateCallbacksConfig::all());
     let terminfo = TermInfo::from_name("xterm").unwrap();
 
@@ -115,7 +115,7 @@ fn state_can_generate_move_rect_events() {
     let mut vterm: VTerm = VTerm::new(&Size {
         height: 2,
         width: 2,
-    });
+    }).unwrap();
 
     let mut config = StateCallbacksConfig::all();
     config.scroll_rect = false;
@@ -141,7 +141,7 @@ fn state_can_generate_move_rect_events_for_part_of_screen() {
     let mut vterm: VTerm = VTerm::new(&Size {
         height: 5,
         width: 2,
-    });
+    }).unwrap();
 
     let mut config = StateCallbacksConfig::all();
     config.scroll_rect = false;
@@ -181,7 +181,7 @@ fn state_can_generate_erase_events() {
     let mut vterm: VTerm = VTerm::new(&Size {
         height: 2,
         width: 2,
-    });
+    }).unwrap();
 
     vterm.state_receive_events(&StateCallbacksConfig::all());
 
@@ -202,7 +202,7 @@ fn state_can_generate_init_pen_events() {
     let mut vterm: VTerm = VTerm::new(&Size {
         height: 2,
         width: 2,
-    });
+    }).unwrap();
     vterm.state_receive_events(&StateCallbacksConfig::all());
 
     let rx = vterm.state_event_rx.take().unwrap();
@@ -216,7 +216,7 @@ fn state_can_generate_pen_background_events() {
     let mut vterm: VTerm = VTerm::new(&Size {
         height: 2,
         width: 2,
-    });
+    }).unwrap();
     vterm.state_receive_events(&StateCallbacksConfig::all());
 
     let terminfo = TermInfo::from_name("xterm").unwrap();
@@ -241,7 +241,7 @@ fn state_can_generate_pen_blink_events() {
     let mut vterm: VTerm = VTerm::new(&Size {
         height: 2,
         width: 2,
-    });
+    }).unwrap();
     vterm.state_receive_events(&StateCallbacksConfig::all());
 
     let terminfo = TermInfo::from_name("xterm").unwrap();
@@ -276,7 +276,7 @@ fn state_can_generate_pen_bold_events() {
     let mut vterm: VTerm = VTerm::new(&Size {
         height: 2,
         width: 2,
-    });
+    }).unwrap();
     vterm.state_receive_events(&StateCallbacksConfig::all());
 
     let terminfo = TermInfo::from_name("xterm").unwrap();
@@ -311,7 +311,7 @@ fn state_can_generate_pen_font_events() {
     let mut vterm: VTerm = VTerm::new(&Size {
         height: 2,
         width: 2,
-    });
+    }).unwrap();
     vterm.state_receive_events(&StateCallbacksConfig::all());
 
     vterm.write(b"\x1b[10m").unwrap();
@@ -339,7 +339,7 @@ fn state_can_generate_pen_foreground_events() {
     let mut vterm: VTerm = VTerm::new(&Size {
         height: 2,
         width: 2,
-    });
+    }).unwrap();
     vterm.state_receive_events(&StateCallbacksConfig::all());
 
     let terminfo = TermInfo::from_name("xterm").unwrap();
@@ -364,7 +364,7 @@ fn state_can_generate_pen_italic_events() {
     let mut vterm: VTerm = VTerm::new(&Size {
         height: 2,
         width: 2,
-    });
+    }).unwrap();
     vterm.state_receive_events(&StateCallbacksConfig::all());
 
     let terminfo = TermInfo::from_name("xterm").unwrap();
@@ -397,7 +397,7 @@ fn state_can_generate_pen_reverse_events() {
     let mut vterm: VTerm = VTerm::new(&Size {
         height: 2,
         width: 2,
-    });
+    }).unwrap();
     vterm.state_receive_events(&StateCallbacksConfig::all());
 
     let terminfo = TermInfo::from_name("xterm").unwrap();
@@ -443,7 +443,7 @@ fn state_can_generate_pen_strike_events() {
     let mut vterm: VTerm = VTerm::new(&Size {
         height: 2,
         width: 2,
-    });
+    }).unwrap();
     vterm.state_receive_events(&StateCallbacksConfig::all());
 
     let terminfo = TermInfo::from_name("xterm").unwrap();
@@ -475,7 +475,7 @@ fn state_can_generate_pen_underline_events() {
     let mut vterm: VTerm = VTerm::new(&Size {
         height: 2,
         width: 2,
-    });
+    }).unwrap();
     vterm.state_receive_events(&StateCallbacksConfig::all());
 
     let terminfo = TermInfo::from_name("xterm").unwrap();
@@ -519,7 +519,7 @@ fn state_can_generate_cursor_visible_events() {
     let mut vterm: VTerm = VTerm::new(&Size {
         height: 2,
         width: 2,
-    });
+    }).unwrap();
     vterm.state_receive_events(&StateCallbacksConfig::all());
 
     let terminfo = TermInfo::from_name("xterm").unwrap();
@@ -554,7 +554,7 @@ fn state_can_generate_cursor_blink_events() {
     let mut vterm: VTerm = VTerm::new(&Size {
         height: 2,
         width: 2,
-    });
+    }).unwrap();
     vterm.state_receive_events(&StateCallbacksConfig::all());
 
     // DECSCUSR
@@ -583,7 +583,7 @@ fn state_can_generate_cursor_shape_events() {
     let mut vterm: VTerm = VTerm::new(&Size {
         height: 2,
         width: 2,
-    });
+    }).unwrap();
     vterm.state_receive_events(&StateCallbacksConfig::all());
 
     // DECSCUSR sequence
@@ -612,7 +612,7 @@ fn state_can_generate_title_events() {
     let mut vterm: VTerm = VTerm::new(&Size {
         height: 2,
         width: 2,
-    });
+    }).unwrap();
     vterm.state_receive_events(&StateCallbacksConfig::all());
 
     // DECSWT
@@ -641,7 +641,7 @@ fn state_can_generate_iconname_events() {
     let mut vterm: VTerm = VTerm::new(&Size {
         height: 2,
         width: 2,
-    });
+    }).unwrap();
     vterm.state_receive_events(&StateCallbacksConfig::all());
 
     // DECSWT
@@ -670,7 +670,7 @@ fn state_can_generate_reverse_events() {
     let mut vterm: VTerm = VTerm::new(&Size {
         height: 2,
         width: 2,
-    });
+    }).unwrap();
     vterm.state_receive_events(&StateCallbacksConfig::all());
 
     // DECSCNM
@@ -699,7 +699,7 @@ fn state_can_generate_mouse_events() {
     let mut vterm: VTerm = VTerm::new(&Size {
         height: 2,
         width: 2,
-    });
+    }).unwrap();
     vterm.state_receive_events(&StateCallbacksConfig::all());
 
     // DECSET for mouse support
@@ -720,7 +720,7 @@ fn state_can_generate_alt_screen_events() {
     let mut vterm: VTerm = VTerm::new(&Size {
         height: 2,
         width: 2,
-    });
+    }).unwrap();
     vterm.state_receive_events(&StateCallbacksConfig::all());
 
     let terminfo = TermInfo::from_name("xterm").unwrap();
@@ -755,7 +755,7 @@ fn state_can_generate_bell_events() {
     let mut vterm: VTerm = VTerm::new(&Size {
         height: 2,
         width: 2,
-    });
+    }).unwrap();
     vterm.state_receive_events(&StateCallbacksConfig::all());
 
     // BEL - for some reason term crate doesn't know about it?
@@ -773,7 +773,7 @@ fn state_can_generate_resize_events() {
     let mut vterm: VTerm = VTerm::new(&Size {
         height: 5,
         width: 5,
-    });
+    }).unwrap();
     vterm.state_receive_events(&StateCallbacksConfig::all());
     vterm.set_size(&Size::new(2,3));
 

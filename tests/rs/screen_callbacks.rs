@@ -9,7 +9,7 @@ fn screen_can_generate_damage_events() {
     let mut vterm: VTerm = VTerm::new(&Size {
         height: 2,
         width: 4,
-    });
+    }).unwrap();
     vterm.screen_receive_events(&ScreenCallbacksConfig::all());
     vterm.screen_set_damage_merge(DamageSize::Screen);
 
@@ -29,7 +29,7 @@ fn screen_can_generate_move_rect_events() {
     let mut vterm: VTerm = VTerm::new(&Size {
         height: 2,
         width: 2,
-    });
+    }).unwrap();
     vterm.screen_receive_events(&ScreenCallbacksConfig::all());
     vterm.screen_set_damage_merge(DamageSize::Screen);
 
@@ -50,7 +50,7 @@ fn screen_can_generate_move_cursor_events() {
     let mut vterm: VTerm = VTerm::new(&Size {
         height: 2,
         width: 2,
-    });
+    }).unwrap();
     vterm.screen_receive_events(&ScreenCallbacksConfig::all());
     vterm.screen_set_damage_merge(DamageSize::Screen);
 
@@ -76,7 +76,7 @@ fn screen_can_generate_alt_screen_events() {
     let mut vterm: VTerm = VTerm::new(&Size {
         height: 2,
         width: 2,
-    });
+    }).unwrap();
     vterm.screen_receive_events(&ScreenCallbacksConfig::all());
     vterm.screen_set_damage_merge(DamageSize::Screen);
 
@@ -112,7 +112,7 @@ fn screen_can_generate_cursor_blink_events() {
     let mut vterm: VTerm = VTerm::new(&Size {
         height: 2,
         width: 2,
-    });
+    }).unwrap();
     vterm.screen_receive_events(&ScreenCallbacksConfig::all());
     vterm.screen_set_damage_merge(DamageSize::Screen);
 

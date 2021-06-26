@@ -12,7 +12,7 @@ pub use self::state::*;
 pub use self::vterm::*;
 pub use self::glyph_info::*;
 
-use libc::{c_int, uint8_t};
+use libc::c_int;
 
 pub const VTERM_MAX_CHARS_PER_CELL: usize = 6;
 
@@ -59,9 +59,9 @@ impl VTermPos {
 #[repr(C)]
 #[derive(PartialEq, Debug, Clone, Default)]
 pub struct VTermColor {
-    pub red: uint8_t,
-    pub green: uint8_t,
-    pub blue: uint8_t,
+    pub red: u8,
+    pub green: u8,
+    pub blue: u8,
 }
 
 impl VTermColor {

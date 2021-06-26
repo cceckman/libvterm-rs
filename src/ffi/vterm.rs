@@ -1,4 +1,4 @@
-use libc::{c_int, uint32_t, size_t, c_char, c_uchar};
+use libc::{c_int, size_t, c_char, c_uchar};
 use super::{VTermModifier, VTermKey};
 
 pub enum VTerm {}
@@ -21,7 +21,7 @@ extern "C" {
 
     pub fn vterm_output_read(vt: *mut VTerm, buffer: *mut c_char, len: size_t) -> size_t;
 
-    pub fn vterm_keyboard_unichar(vt: *mut VTerm, c: uint32_t, modifier: VTermModifier);
+    pub fn vterm_keyboard_unichar(vt: *mut VTerm, c: u32, modifier: VTermModifier);
     pub fn vterm_keyboard_key(vt: *mut VTerm, key: VTermKey, modifier: VTermModifier);
 
     pub fn vterm_keyboard_start_paste(vt: *mut VTerm);

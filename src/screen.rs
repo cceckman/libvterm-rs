@@ -72,7 +72,7 @@ pub enum DamageSize {
 impl VTerm {
     /// Reset the screen. I've observed this needs to happen before using or segfaults will occur.
     pub fn screen_reset(&mut self, is_hard: bool) {
-        unsafe { ffi::vterm_screen_reset(self.screen_ptr.get_mut(), super::bool_to_int(is_hard)) }
+        unsafe { ffi::vterm_screen_reset(self.screen_ptr.as_mut(), super::bool_to_int(is_hard)) }
     }
 
     /// Return the cell at the given position
@@ -86,7 +86,7 @@ impl VTerm {
 
         let cell_buf = unsafe { ffi::vterm_cell_new() };
         unsafe {
-            ffi::vterm_screen_get_cell(self.screen_ptr.get(),
+            ffi::vterm_screen_get_cell(self.screen_ptr.as_ref(),
                                        ffi::VTermPos::from_pos(&pos),
                                        cell_buf)
         };
@@ -106,7 +106,7 @@ impl VTerm {
     // Returns the text within the rect as a String or panics if invalid utf8 bytes are found
     pub fn screen_get_text(&self, rect: &Rect) -> Result<String, ::std::string::FromUtf8Error> {
         let bytes = self.get_text_as_bytes(rect);
-        let v = try! { String::from_utf8(bytes) };
+        let v = String::from_utf8(bytes)?;
         Ok(v)
     }
 
@@ -124,7 +124,7 @@ impl VTerm {
         let bytes_ptr: *mut c_char = (&mut bytes[0..size]).as_mut_ptr();
 
         unsafe {
-            let len = ffi::vterm_screen_get_text(self.screen_ptr.get(),
+            let len = ffi::vterm_screen_get_text(self.screen_ptr.as_ref(),
                                                  bytes_ptr,
                                                  size as size_t,
                                                  ffi::VTermRect::from_rect(&rect));
@@ -135,7 +135,7 @@ impl VTerm {
     }
 
     pub fn screen_flush_damage(&mut self) {
-        unsafe { ffi::vterm_screen_flush_damage(self.screen_ptr.get_mut()) };
+        unsafe { ffi::vterm_screen_flush_damage(self.screen_ptr.as_mut()) };
     }
 
     pub fn screen_set_damage_merge(&mut self, size: DamageSize) {
@@ -145,7 +145,7 @@ impl VTerm {
             DamageSize::Screen => ffi::VTermDamageSize::VTermDamageScreen,
             DamageSize::Scroll => ffi::VTermDamageSize::VTermDamageScroll,
         };
-        unsafe { ffi::vterm_screen_set_damage_merge(self.screen_ptr.get_mut(), ffi_size) };
+        unsafe { ffi::vterm_screen_set_damage_merge(self.screen_ptr.as_mut(), ffi_size) };
     }
 
     pub fn screen_get_cells_in_rect(&self, rect: &Rect) -> Vec<ScreenCell> {
@@ -215,7 +215,7 @@ impl VTerm {
 
         unsafe {
             let self_ptr: *mut c_void = self as *mut _ as *mut c_void;
-            ffi::vterm_screen_set_callbacks(self.screen_ptr.get_mut(),
+            ffi::vterm_screen_set_callbacks(self.screen_ptr.as_mut(),
                                             self.screen_callbacks.as_ref().unwrap(),
                                             self_ptr);
         }
@@ -231,7 +231,7 @@ mod tests {
         let mut vterm: VTerm = VTerm::new(&Size {
             height: 2,
             width: 2,
-        });
+        }).unwrap();
         vterm.screen_reset(true);
     }
 }

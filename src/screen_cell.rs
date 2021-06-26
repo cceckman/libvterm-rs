@@ -1,5 +1,5 @@
 use std::vec::Vec;
-use libc::{uint32_t, size_t};
+use libc::{size_t};
 
 use super::*;
 
@@ -47,7 +47,7 @@ impl ScreenCell {
         let fg_rgb = unsafe { ffi::vterm_cell_get_fg(ptr) };
         let bg_rgb = unsafe { ffi::vterm_cell_get_bg(ptr) };
 
-        let mut buf = [0 as uint32_t; ffi::VTERM_MAX_CHARS_PER_CELL];
+        let mut buf = [0 as u32; ffi::VTERM_MAX_CHARS_PER_CELL];
         let chars_count = unsafe {
             ffi::vterm_cell_get_chars(ptr,
                                       buf.as_mut_ptr(),

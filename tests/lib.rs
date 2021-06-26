@@ -13,7 +13,7 @@ use std::io::prelude::*;
 
 #[test]
 fn screen_can_get_text() {
-    let mut vterm: VTerm = VTerm::new(&Size { height: 2, width: 2 });
+    let mut vterm: VTerm = VTerm::new(&Size { height: 2, width: 2 }).unwrap();
     vterm.write(b"hi").unwrap();
 
     let text = vterm.screen_get_text_lossy(&Rect::new(Pos {

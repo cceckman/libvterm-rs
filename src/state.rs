@@ -87,7 +87,7 @@ impl VTerm {
         let mut fg_rgb: ffi::VTermColor = Default::default();
         let mut bg_rgb: ffi::VTermColor = Default::default();
         unsafe {
-            ffi::vterm_state_get_default_colors(self.state_ptr.get(), &mut fg_rgb, &mut bg_rgb)
+            ffi::vterm_state_get_default_colors(self.state_ptr.as_ref(), &mut fg_rgb, &mut bg_rgb)
         };
 
         (ColorRGB {
@@ -115,14 +115,14 @@ impl VTerm {
         };
 
         unsafe {
-            ffi::vterm_state_set_default_colors(self.state_ptr.get_mut(), &fg_rgb, &bg_rgb);
+            ffi::vterm_state_set_default_colors(self.state_ptr.as_mut(), &fg_rgb, &bg_rgb);
         };
     }
 
     pub fn state_get_rgb_color_from_palette(&self, index: usize) -> ColorRGB {
         let mut ffi_color: ffi::VTermColor = Default::default();
         unsafe {
-            ffi::vterm_state_get_palette_color(self.state_ptr.get(),
+            ffi::vterm_state_get_palette_color(self.state_ptr.as_ref(),
                                                index as c_int,
                                                &mut ffi_color);
         }
@@ -156,7 +156,7 @@ impl VTerm {
 
     pub fn state_reset(&mut self, hard: bool) {
         unsafe {
-            ffi::vterm_state_reset(self.state_ptr.get_mut(), ::bool_to_int(hard));
+            ffi::vterm_state_reset(self.state_ptr.as_mut(), ::bool_to_int(hard));
         }
     }
 
@@ -230,7 +230,7 @@ impl VTerm {
 
         unsafe {
             let self_ptr: *mut c_void = self as *mut _ as *mut c_void;
-            ffi::vterm_state_set_callbacks(self.state_ptr.get_mut(),
+            ffi::vterm_state_set_callbacks(self.state_ptr.as_mut(),
                                            self.state_callbacks.as_ref().unwrap(),
                                            self_ptr);
         }
@@ -247,7 +247,7 @@ mod tests {
         let mut vterm: VTerm = VTerm::new(&Size {
             height: 2,
             width: 2,
-        });
+        }).unwrap();
         vterm.state_set_default_colors(&ColorRGB {
                                            red: 200,
                                            green: 201,

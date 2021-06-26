@@ -214,7 +214,7 @@ fn main() {
     let mut vt = VTerm::new(&Size {
         height: context.rows_count,
         width: context.cols_count,
-    });
+    }).unwrap();
 
     vt.set_utf8(true);
 

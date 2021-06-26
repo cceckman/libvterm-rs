@@ -1,5 +1,5 @@
 use std::vec::Vec;
-use libc::{size_t, uint32_t};
+use libc::{size_t};
 
 use super::*;
 
@@ -14,7 +14,7 @@ pub struct GlyphInfo {
 
 impl GlyphInfo {
     pub fn from_ptr(ptr: *const ffi::VTermGlyphInfo) -> GlyphInfo {
-        let mut buf = [0 as uint32_t; ffi::VTERM_MAX_CHARS_PER_CELL];
+        let mut buf = [0 as u32; ffi::VTERM_MAX_CHARS_PER_CELL];
         let chars_count = unsafe {
             ffi::vterm_glyph_info_get_chars(ptr,
                                             buf.as_mut_ptr(),

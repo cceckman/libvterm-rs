@@ -1,4 +1,4 @@
-use libc::{c_int, c_void, size_t, uint32_t, c_char};
+use libc::{c_int, c_void, size_t, c_char};
 
 use super::*;
 
@@ -64,7 +64,7 @@ extern "C" {
     pub fn vterm_screen_reset(screen: *mut VTermScreen, hard: c_int);
 
     pub fn vterm_screen_get_chars(screen: *const VTermScreen,
-                                  chars: *mut uint32_t,
+                                  chars: *mut u32,
                                   len: size_t,
                                   rect: VTermRect)
                                   -> size_t;

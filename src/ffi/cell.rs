@@ -1,4 +1,4 @@
-use libc::{c_int, c_uint, uint32_t, size_t, c_char};
+use libc::{c_int, c_uint, size_t, c_char};
 use super::VTermColor;
 
 pub enum VTermScreenCell {}
@@ -11,10 +11,10 @@ extern "C" {
     pub fn vterm_cell_new() -> *mut VTermScreenCell;
     pub fn vterm_cell_free(cell: *mut VTermScreenCell);
     pub fn vterm_cell_get_chars(cell: *const VTermScreenCell,
-                                chars: *mut uint32_t,
+                                chars: *mut u32,
                                 len: size_t)
                                 -> c_int;
-    pub fn vterm_cell_set_chars(cell: *mut VTermScreenCell, chars: *const uint32_t, len: size_t);
+    pub fn vterm_cell_set_chars(cell: *mut VTermScreenCell, chars: *const u32, len: size_t);
     pub fn vterm_cell_get_width(cell: *const VTermScreenCell) -> c_char;
     pub fn vterm_cell_set_width(cell: *mut VTermScreenCell, width: c_char);
     pub fn vterm_cell_get_bold(cell: *const VTermScreenCell) -> c_uint;
