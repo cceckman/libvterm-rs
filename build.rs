@@ -15,6 +15,11 @@ fn bindgen() {
         .header("vendor/libvterm/include/vterm.h")
         // ...or any of the included headers.
         .parse_callbacks(Box::new(bindgen::CargoCallbacks))
+        .detect_include_paths(true)
+        .use_core()
+        .size_t_is_usize(true)
+        .translate_enum_integer_types(true)
+        .ctypes_prefix("::libc")
         .generate()
         .expect("Unable to generate bindings");
 
@@ -41,5 +46,6 @@ fn build_libvterm() {
 
 fn main() {
     bindgen();
-    build_libvterm();
+    // DO NOT SUBMIT: Suppress all the cc warnings
+    // build_libvterm();
 }

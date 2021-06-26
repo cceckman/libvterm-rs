@@ -4,6 +4,7 @@ use libc::{c_char, c_int, c_uchar, size_t};
 pub enum VTerm {}
 
 extern "C" {
+    /*
     pub fn vterm_new(rows: c_int, cols: c_int) -> *mut VTerm;
     pub fn vterm_free(vt: *mut VTerm);
 
@@ -33,7 +34,7 @@ extern "C" {
         button: c_int,
         pressed: bool,
         modifier: VTermModifier,
-    );
+    );*/
 }
 
 mod tests {

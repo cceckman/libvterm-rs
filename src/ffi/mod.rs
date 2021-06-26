@@ -1,3 +1,4 @@
+mod bindings;
 mod cell;
 mod glyph_info;
 mod parser;
@@ -11,6 +12,7 @@ pub use self::parser::*;
 pub use self::screen::*;
 pub use self::state::*;
 pub use self::vterm::*;
+pub use bindings::*;
 
 use libc::c_int;
 

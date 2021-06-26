@@ -6,7 +6,9 @@ extern "C" {
 #endif
 
 #include <stdint.h>
-#include <stdlib.h>
+// TODO(cceckman): Upstream this change
+// #include <stdlib.h>
+#include <stddef.h>
 #include <stdbool.h>
 
 #include "vterm_keycodes.h"
