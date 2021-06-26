@@ -13,6 +13,8 @@
       * `libvterm-0.1.4` changes the color API, from RGB to tagged-union
         (RGB-or-palette).
       * Consider using `bindgen` instead of hand-rolled FFI.
+        The `#include <stdlib.h>` - rather than `#include <stddef.h>` -
+        makes the `bindgen`'d version much larger than it needs to be.
 * [x] rethink representing cell data as char vs Vec<u8> or [u8] or whatever.
 * [ ] add methods to ffi datatypes to convert from that and rust
 * [x] use geometry library from crates.io
